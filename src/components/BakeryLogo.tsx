@@ -1,5 +1,5 @@
 import React from 'react';
-import defaultLogo from '../assets/logo.jpeg';
+import defaultLogo from '../assets/logo.png';
 
 interface BakeryLogoProps {
   variant?: string;
@@ -45,15 +45,17 @@ export const BakeryLogo: React.FC<BakeryLogoProps> = ({
   const scaleFactor = (pxMap[size] || 56) / 224;
 
   return (
-    <div className={`rounded-full overflow-hidden shrink-0 bg-gray-100 ${dimensionClass} ${className} flex items-center justify-center relative`}>
+    <div className={`rounded-full overflow-hidden shrink-0 bg-gray-100 ${dimensionClass} ${className} relative isolate`}>
       <img 
         referrerPolicy="no-referrer"
         src={customLogoUrl} 
         alt="Logo"
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover"
         style={{
-          transform: `scale(${logoZoom}) translate(${logoOffsetX * scaleFactor}px, ${logoOffsetY * scaleFactor}px)`,
-          transformOrigin: 'center'
+          transform: `scale(${logoZoom}) translate(${logoOffsetX * scaleFactor}px, ${logoOffsetY * scaleFactor}px) translateZ(0)`,
+          transformOrigin: 'center',
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden'
         }}
       />
     </div>
