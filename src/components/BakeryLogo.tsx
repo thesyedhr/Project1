@@ -14,7 +14,7 @@ interface BakeryLogoProps {
 export const BakeryLogo: React.FC<BakeryLogoProps> = ({
   size = 'md',
   className = '',
-  customLogoUrl = '/logo.jpeg',
+  customLogoUrl = `${import.meta.env.BASE_URL}logo.jpeg`,
   logoZoom = 1.70,
   logoOffsetX = 0,
   logoOffsetY = 4,

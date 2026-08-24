@@ -73,9 +73,15 @@ export const Hero: React.FC<HeroProps> = ({
               Maison Levain
             </h1>
 
-            <p className="text-sm sm:text-base md:text-lg text-[#5E5244] max-w-2xl mx-auto font-normal leading-relaxed">
+            <motion.p 
+              className="text-sm sm:text-base md:text-lg text-[#5E5244] max-w-2xl mx-auto font-normal leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
               Handcrafting slow wild-fermented sourdoughs, French viennoiserie, and bespoke pastries with ancient stoneground bio flours, unhurried 36-hour fermentation, and mountain spring water.
-            </p>
+            </motion.p>
           </div>
 
           {/* 4. Bakery Details Badges & Quick Info in Perfect Grid */}
@@ -184,9 +190,15 @@ export const Hero: React.FC<HeroProps> = ({
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white leading-tight">
                 Slow-Fermented at 12°C for Deep Umami & Golden Blistered Crusts
               </h2>
-              <p className="text-xs sm:text-sm text-[#E2D5C5] leading-relaxed hidden sm:block">
+              <motion.p 
+                className="text-xs sm:text-sm text-[#E2D5C5] leading-relaxed hidden sm:block"
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+              >
                 Each loaf undergoes a gentle 36-hour wild levain fermentation, yielding an open custard-like crumb and digestible, mineral-rich nourishment.
-              </p>
+              </motion.p>
             </div>
 
             {/* Micro Badge for Proofing */}
