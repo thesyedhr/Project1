@@ -1,4 +1,5 @@
 import React from 'react';
+import defaultLogo from '../assets/logo.jpeg';
 
 interface BakeryLogoProps {
   variant?: string;
@@ -14,7 +15,7 @@ interface BakeryLogoProps {
 export const BakeryLogo: React.FC<BakeryLogoProps> = ({
   size = 'md',
   className = '',
-  customLogoUrl = `${import.meta.env.BASE_URL}logo.jpeg`,
+  customLogoUrl = defaultLogo,
   logoZoom = 1.70,
   logoOffsetX = 0,
   logoOffsetY = 4,
