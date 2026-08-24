@@ -1,0 +1,306 @@
+import React, { useState } from 'react';
+import { BakeryItem, SlicingOption } from '../types';
+import { X, Wheat, Clock, Droplets, Check, Plus, Minus, Heart, ShieldAlert, Sparkles, Gift } from 'lucide-react';
+
+interface ProductDetailModalProps {
+  item: BakeryItem | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onAddToCart: (
+    item: BakeryItem,
+    quantity: number,
+    slicing?: SlicingOption,
+    warmed?: boolean,
+    giftBox?: boolean,
+    notes?: string
+  ) => void;
+}
+
+export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+  item,
+  isOpen,
+  onClose,
+  onAddToCart,
+}) => {
+  if (!isOpen || !item) return null;
+
+  const [quantity, setQuantity] = useState(1);
+  const [selectedSlicing, setSelectedSlicing] = useState<SlicingOption>('Whole Loaf');
+  const [warmed, setWarmed] = useState(false);
+  const [giftBox, setGiftBox] = useState(false);
+  const [customNotes, setCustomNotes] = useState('');
+  const [addedAnimation, setAddedAnimation] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const slicingOptions: SlicingOption[] = [
+    'Whole Loaf',
+    'Standard Slice (12mm)',
+    'Thick Rustic Slice (18mm)',
+    'Toast Cut (10mm)',
+  ];
+
+  const giftBoxPrice = giftBox ? 2.50 : 0;
+  const totalPrice = (item.price + giftBoxPrice) * quantity;
+
+  const handleAdd = () => {
+    onAddToCart(
+      item,
+      quantity,
+      item.canBeSliced ? selectedSlicing : undefined,
+      warmed,
+      giftBox,
+      customNotes.trim() || undefined
+    );
+    setAddedAnimation(true);
+    setTimeout(() => {
+      setAddedAnimation(false);
+      onClose();
+    }, 400);
+  };
+
+  const fallbackImage = 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Home_made_sour_dough_bread.jpg/1280px-Home_made_sour_dough_bread.jpg';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-md animate-fade-in">
+      <div 
+        id="product-detail-modal"
+        className="relative w-full max-w-3xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#E5DACD] overflow-hidden my-auto"
+      >
+        {/* Close Button */}
+        <button
+          id="close-product-detail-modal"
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/85 hover:bg-white text-[#341C02] backdrop-blur-sm shadow-md transition-all active:scale-95"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 max-h-[85vh] overflow-y-auto">
+          
+          {/* Left Column: High-Res Photo & Craft Badges */}
+          <div className="md:col-span-5 relative bg-[#EFE8DC] min-h-[260px] md:min-h-[460px] overflow-hidden">
+            <img
+              src={imageError ? fallbackImage : item.imageUrl}
+              alt={item.name}
+              onError={() => setImageError(true)}
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1C140E]/85 via-black/20 to-transparent" />
+
+            {/* Floating Image Badges */}
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              {item.frenchName && (
+                <p className="text-xs italic font-serif text-[#E8C5A0]">
+                  {item.frenchName}
+                </p>
+              )}
+              <p className="font-serif text-2xl font-bold">{item.name}</p>
+              <p className="text-xs text-[#D8C7B5] mt-1 font-medium">
+                {item.weightGrams ? `${item.weightGrams}g Hearth Loaf` : 'Small-Batch Handcrafted'}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column: Details, Craft Specs & Customization */}
+          <div className="md:col-span-7 p-6 sm:p-8 space-y-5 flex flex-col justify-between">
+            
+            <div className="space-y-4">
+              
+              {/* Header Info */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#8D4B26] bg-[#F7EFE6] px-2.5 py-0.5 rounded-full">
+                    {item.category}
+                  </span>
+                  <div className="flex items-center gap-1 text-xs font-semibold text-[#5E5244]">
+                    <span>★ {item.rating}</span>
+                    <span className="text-[#9E9080]">({item.reviewsCount} reviews)</span>
+                  </div>
+                </div>
+
+                <h2 className="text-2xl font-serif font-bold text-[#341C02] mt-1.5">
+                  {item.name}
+                </h2>
+                
+                <p className="text-sm text-[#5E5244] leading-relaxed mt-2">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Craft Specifications Bar */}
+              <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-[#F4EDE2] border border-[#E8DFD1] text-center">
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-center gap-1 text-[11px] text-[#786C5E] font-medium">
+                    <Clock className="w-3.5 h-3.5 text-[#A8794E]" />
+                    <span>Ferment</span>
+                  </div>
+                  <p className="text-xs font-bold text-[#341C02]">
+                    {item.fermentationHours ? `${item.fermentationHours} Hours` : '18 Hours'}
+                  </p>
+                </div>
+
+                <div className="space-y-0.5 border-x border-[#DFD3C3]">
+                  <div className="flex items-center justify-center gap-1 text-[11px] text-[#786C5E] font-medium">
+                    <Droplets className="w-3.5 h-3.5 text-[#A8794E]" />
+                    <span>Hydration</span>
+                  </div>
+                  <p className="text-xs font-bold text-[#341C02]">
+                    {item.hydrationPercentage ? `${item.hydrationPercentage}%` : '80%'}
+                  </p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-center gap-1 text-[11px] text-[#786C5E] font-medium">
+                    <Wheat className="w-3.5 h-3.5 text-[#A8794E]" />
+                    <span>Flour</span>
+                  </div>
+                  <p className="text-xs font-bold text-[#341C02] truncate px-1">
+                    {item.flourType ? item.flourType.split('&')[0] : 'Heritage T65'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Ingredients & Allergens */}
+              <div className="text-xs space-y-1.5 bg-white p-3.5 rounded-xl border border-[#EAE0D3]">
+                <p className="text-[#4A3C2F] font-semibold flex items-center gap-1">
+                  <Wheat className="w-3.5 h-3.5 text-[#A8794E]" />
+                  <span>Key Ingredients:</span>
+                </p>
+                <p className="text-[#6E5E4F] leading-normal">
+                  {item.ingredients.join(', ')}
+                </p>
+                <div className="pt-1 flex items-center gap-1 text-[11px] text-[#8C7A68]">
+                  <ShieldAlert className="w-3.5 h-3.5 text-[#C17D44]" />
+                  <span>Allergens: {item.allergens.join(', ')}</span>
+                </div>
+              </div>
+
+              {/* Baker's Pairing Advice */}
+              {item.pairingNotes && (
+                <div className="text-xs p-3 rounded-xl bg-[#FFF9F3] border border-[#F0DFCF] text-[#7A4B29] flex items-start gap-2">
+                  <Sparkles className="w-4 h-4 text-[#C17D44] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">Baker's Pairing: </span>
+                    <span>{item.pairingNotes}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Slicing Selection (if bread) */}
+              {item.canBeSliced && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#5E5244] block">
+                    Bread Slicing Preference (Included)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {slicingOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setSelectedSlicing(opt)}
+                        className={`p-2.5 text-xs rounded-xl font-medium text-left border transition-all ${
+                          selectedSlicing === opt
+                            ? 'bg-[#341C02] text-[#FAF7F2] border-[#341C02] shadow-sm'
+                            : 'bg-white text-[#4A3C2F] border-[#E2D7CA] hover:border-[#C8B8A6]'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Warming & Gift Options */}
+              <div className="space-y-2 pt-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#5E5244] block">
+                  Finishing Touches
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  
+                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#E2D7CA] bg-white cursor-pointer hover:bg-[#FAF6F0] transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={warmed}
+                      onChange={(e) => setWarmed(e.target.checked)}
+                      className="rounded text-[#341C02] focus:ring-[#8D4B26]"
+                    />
+                    <span className="text-[#4A3C2F] font-medium">
+                      Oven-Warmed for Immediate Pickup
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-[#E2D7CA] bg-white cursor-pointer hover:bg-[#FAF6F0] transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={giftBox}
+                      onChange={(e) => setGiftBox(e.target.checked)}
+                      className="rounded text-[#341C02] focus:ring-[#8D4B26]"
+                    />
+                    <span className="text-[#4A3C2F] font-medium flex items-center gap-1">
+                      <Gift className="w-3.5 h-3.5 text-[#8D4B26]" />
+                      Linen Gift Wrap (+$2.50)
+                    </span>
+                  </label>
+
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Bottom: Quantity & Add Button */}
+            <div className="pt-4 border-t border-[#E5DACD] space-y-3">
+              <div className="flex items-center justify-between gap-4">
+                
+                {/* Quantity Stepper */}
+                <div className="flex items-center bg-white border border-[#D9CEBF] rounded-xl p-1 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-1.5 hover:bg-[#F2ECE1] rounded-lg text-[#5E5244] transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="px-3 font-serif font-bold text-sm text-[#341C02]">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-1.5 hover:bg-[#F2ECE1] rounded-lg text-[#5E5244] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Add to Order Button */}
+                <button
+                  id="modal-add-to-cart-btn"
+                  onClick={handleAdd}
+                  disabled={addedAnimation}
+                  className="flex-1 bg-[#341C02] hover:bg-[#45372B] text-[#FAF7F2] px-6 py-3.5 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {addedAnimation ? (
+                    <>
+                      <Check className="w-4 h-4 text-[#A8D5BA]" />
+                      <span>Added to Basket</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Add to Order</span>
+                      <span className="text-[#E8C5A0] font-serif">• ${totalPrice.toFixed(2)}</span>
+                    </>
+                  )}
+                </button>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
