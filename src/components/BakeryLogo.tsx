@@ -45,7 +45,7 @@ export const BakeryLogo: React.FC<BakeryLogoProps> = ({
   const scaleFactor = (pxMap[size] || 56) / 224;
 
   return (
-    <div className={`rounded-full overflow-hidden shrink-0 bg-gray-100 ${dimensionClass} ${className} relative isolate`}>
+    <div className={`rounded-full overflow-hidden shrink-0 bg-transparent ${dimensionClass} ${className} relative isolate`}>
       <img 
         referrerPolicy="no-referrer"
         src={customLogoUrl} 
