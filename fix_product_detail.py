@@ -1,29 +1,28 @@
-import sys
 import re
 
 with open('src/components/ProductDetailModal.tsx', 'r') as f:
     content = f.read()
 
-# I will replace everything from "return (" to the end of the file with a clean version.
+# Replace `if (!item) return <AnimatePresence />;`
+replacement = """  const previousItemRef = React.useRef<BakeryItem | null>(null);
+  if (item) {
+    previousItemRef.current = item;
+  }
+  const displayItem = item || previousItemRef.current;
 
-# Wait, this might be too much, but I'll write a script to just replace the broken end tags.
-# In the current file, the end tags look like this:
-#             </div>
-#           </div>
-#         </motion.div>
-#       </motion.div>
-#     </motion.div>
-#   )}
-# </AnimatePresence>
-#   );
-# };
+  if (!displayItem) return <AnimatePresence />;
+"""
+content = content.replace("  if (!item) return <AnimatePresence />;\n", replacement)
 
-# Actually, I should just find the end of the modal body and fix it.
-content = re.sub(
-    r'(\s*)</div>\n\s*</div>\n\s*</div>\n\s*</motion\.div>\n\s*</motion\.div>\n\s*</motion\.div>\n\s*)}\n\s*</AnimatePresence>\n\s*\);\n};',
-    r'\1</motion.div>\n\1</motion.div>\n\1</motion.div>\n\1)}\n</AnimatePresence>\n  );\n};',
-    content, flags=re.DOTALL
-)
+# Now, we need to replace `item` with `displayItem` below line 54, but not the prop `item`.
+# Since `item` is mostly used as `item.price`, `item.canBeSliced`, `{item.name}`, `item.imageUrl`, etc.
+# We can regex replace `\bitem\b` with `displayItem` AFTER the displayItem declaration.
+
+parts = content.split("  if (!displayItem) return <AnimatePresence />;\n")
+if len(parts) == 2:
+    new_bottom = re.sub(r'\bitem\b', 'displayItem', parts[1])
+    content = parts[0] + "  if (!displayItem) return <AnimatePresence />;\n" + new_bottom
 
 with open('src/components/ProductDetailModal.tsx', 'w') as f:
     f.write(content)
+

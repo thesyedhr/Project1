@@ -51,16 +51,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
 
-  if (!item) return <AnimatePresence />;
+  const previousItemRef = React.useRef<BakeryItem | null>(null);
+  if (item) {
+    previousItemRef.current = item;
+  }
+  const displayItem = item || previousItemRef.current;
 
-  const totalPrice = (item.price + (giftBox ? 2.50 : 0)) * quantity;
+  if (!displayItem) return <AnimatePresence />;
+
+  const totalPrice = (displayItem.price + (giftBox ? 2.50 : 0)) * quantity;
 
   const handleAdd = () => {
     setAddedAnimation(true);
     onAddToCart(
-      item,
+      displayItem,
       quantity,
-      item.canBeSliced ? selectedSlicing : undefined,
+      displayItem.canBeSliced ? selectedSlicing : undefined,
       warmed,
       giftBox,
       customNotes
@@ -120,8 +126,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   initial={{ scale: 1.1, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.6 }}
-                  src={imageError ? fallbackImage : item.imageUrl}
-                  alt={item.name}
+                  src={imageError ? fallbackImage : displayItem.imageUrl}
+                  alt={displayItem.name}
                   onError={() => setImageError(true)}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -130,18 +136,18 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 
                 {/* Bottom Left Stats */}
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  {item.badges && item.badges.length > 0 && (
+                  {displayItem.badges && displayItem.badges.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {item.badges.map((badge, idx) => (
+                      {displayItem.badges.map((badge, idx) => (
                         <span key={idx} className="px-2.5 py-1 bg-[#8D4B26] text-white text-[10px] font-bold uppercase tracking-wider rounded-md">
                           {badge}
                         </span>
                       ))}
                     </div>
                   )}
-                  <p className="font-serif text-2xl font-bold">{item.name}</p>
+                  <p className="font-serif text-2xl font-bold">{displayItem.name}</p>
                   <p className="text-xs text-[#D8C7B5] mt-1 font-medium">
-                    {item.weightGrams ? `${item.weightGrams}g Hearth Loaf` : 'Small-Batch Handcrafted'}
+                    {displayItem.weightGrams ? `${displayItem.weightGrams}g Hearth Loaf` : 'Small-Batch Handcrafted'}
                   </p>
                 </div>
               </div>
@@ -158,12 +164,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         <span>Artisan Process</span>
                       </div>
                       <span className="font-serif font-bold text-xl text-[#341C02]">
-                        ${item.price.toFixed(2)}
+                        ${displayItem.price.toFixed(2)}
                       </span>
                     </div>
                     
                     <p className="text-sm text-[#5E5244] leading-relaxed mt-3">
-                      {item.description}
+                      {displayItem.description}
                     </p>
                   </motion.div>
 
@@ -175,7 +181,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         <span>Ferment</span>
                       </div>
                       <p className="text-xs font-bold text-[#341C02]">
-                        {item.fermentationHours ? `${item.fermentationHours} Hours` : '18 Hours'}
+                        {displayItem.fermentationHours ? `${displayItem.fermentationHours} Hours` : '18 Hours'}
                       </p>
                     </div>
                     <div className="space-y-0.5 border-x border-[#DFD3C3]">
@@ -184,7 +190,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         <span>Hydration</span>
                       </div>
                       <p className="text-xs font-bold text-[#341C02]">
-                        {item.hydrationPercentage ? `${item.hydrationPercentage}%` : '80%'}
+                        {displayItem.hydrationPercentage ? `${displayItem.hydrationPercentage}%` : '80%'}
                       </p>
                     </div>
                     <div className="space-y-0.5">
@@ -193,7 +199,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         <span>Flour</span>
                       </div>
                       <p className="text-xs font-bold text-[#341C02] truncate px-1">
-                        {item.flourType ? item.flourType.split('&')[0] : 'Heritage T65'}
+                        {displayItem.flourType ? displayItem.flourType.split('&')[0] : 'Heritage T65'}
                       </p>
                     </div>
                   </motion.div>
@@ -205,27 +211,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       <span>Key Ingredients:</span>
                     </p>
                     <p className="text-[#6E5E4F] leading-normal">
-                      {item.ingredients.join(', ')}
+                      {displayItem.ingredients.join(', ')}
                     </p>
                     <div className="pt-1 flex items-center gap-1 text-[11px] text-[#8C7A68]">
                       <ShieldAlert className="w-3.5 h-3.5 text-[#C17D44]" />
-                      <span>Allergens: {item.allergens.join(', ')}</span>
+                      <span>Allergens: {displayItem.allergens.join(', ')}</span>
                     </div>
                   </motion.div>
 
                   {/* Baker's Pairing Advice */}
-                  {item.pairingNotes && (
+                  {displayItem.pairingNotes && (
                     <motion.div variants={childVariants} className="text-xs p-3 rounded-xl bg-[#FFF9F3] border border-[#F0DFCF] text-[#7A4B29] flex items-start gap-2">
                       <Sparkles className="w-4 h-4 text-[#C17D44] shrink-0 mt-0.5" />
                       <div>
                         <span className="font-bold">Baker's Pairing: </span>
-                        <span>{item.pairingNotes}</span>
+                        <span>{displayItem.pairingNotes}</span>
                       </div>
                     </motion.div>
                   )}
                   
                   {/* Slicing Selection (if bread) */}
-                  {item.canBeSliced && (
+                  {displayItem.canBeSliced && (
                     <motion.div variants={childVariants} className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-[#5E5244] block">
                         Bread Slicing Preference (Included)

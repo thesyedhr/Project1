@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { BakeryItem, CustomBoxItem } from '../types';
 import { BAKERY_PRODUCTS } from '../data/products';
 import { X, Sparkles, Plus, Minus, Gift, Check, Trash2 } from 'lucide-react';
@@ -14,7 +15,6 @@ export const CustomBoxBuilderModal: React.FC<CustomBoxBuilderModalProps> = ({
   onClose,
   onAddBoxToCart,
 }) => {
-  if (!isOpen) return null;
 
   const [boxSize, setBoxSize] = useState<4 | 6>(4);
   const [selectedItems, setSelectedItems] = useState<{ item: BakeryItem; quantity: number }[]>([]);
@@ -84,11 +84,25 @@ export const CustomBoxBuilderModal: React.FC<CustomBoxBuilderModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/50 backdrop-blur-md animate-fade-in">
-      <div 
-        id="custom-box-builder-modal"
-        className="relative w-full max-w-4xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#341C02] overflow-hidden my-auto"
-      >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/50 backdrop-blur-md"
+          onClick={onClose}
+        >
+          <motion.div
+            id="custom-box-builder-modal"
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
+            className="relative w-full max-w-4xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#341C02] overflow-hidden my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
         {/* Header */}
         <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] relative">
           <button
@@ -401,7 +415,9 @@ export const CustomBoxBuilderModal: React.FC<CustomBoxBuilderModalProps> = ({
           </div>
 
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

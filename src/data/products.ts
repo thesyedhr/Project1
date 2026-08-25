@@ -312,7 +312,7 @@ export const BAKERY_PRODUCTS: BakeryItem[] = [
     description: 'Slow-churned from organic grass-fed cream cultured for 48 hours and blended with coarse Guerande fleur de sel crystals for an unbelievable richness and crunch.',
     price: 9.50,
     category: 'provisions',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Beurre_d%27Isigny_2.jpg/1280px-Beurre_d%27Isigny_2.jpg',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Block_of_butter_in_butter_dish.jpg/1280px-Block_of_butter_in_butter_dish.jpg',
     tags: ['48h Cultured', 'Grass-Fed'],
     dietary: ['Vegetarian', 'Organic'],
     ingredients: ['Pasteurized Organic Cream', 'Active Lactic Ferments', 'Guerande Fleur de Sel'],

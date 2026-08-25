@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { OrderDetails } from '../types';
 import { X, CheckCircle2, QrCode, Clock, MapPin, Printer, Sparkles, ChefHat, Flame } from 'lucide-react';
 import { BakeryLogo } from './BakeryLogo';
@@ -15,18 +16,38 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  if (!isOpen || !order) return null;
+  const previousOrderRef = useRef<OrderDetails | null>(null);
+  if (order) {
+    previousOrderRef.current = order;
+  }
+  const displayOrder = order || previousOrderRef.current;
+
+  if (!displayOrder) return <AnimatePresence />;
 
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-md animate-fade-in">
-      <div 
-        id="order-confirmation-modal"
-        className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#E5DACD] overflow-hidden my-auto"
-      >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-md"
+          onClick={onClose}
+        >
+          <motion.div
+            id="displayOrder-confirmation-modal"
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
+            className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#E5DACD] overflow-hidden my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
         {/* Header Ribbon */}
         <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] text-center relative">
           <button
@@ -46,11 +67,11 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
           </p>
 
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
-            Merci, {order.customerName}!
+            Merci, {displayOrder.customerName}!
           </h2>
 
           <p className="text-xs sm:text-sm text-[#D8C7B5] mt-1">
-            Order Reference: <strong className="text-white font-mono">{order.id}</strong>
+            Order Reference: <strong className="text-white font-mono">{displayOrder.id}</strong>
           </p>
         </div>
 
@@ -97,25 +118,25 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                 <span>Scheduled Fulfillment Window</span>
               </div>
               <p className="font-serif font-bold text-sm text-[#341C02]">
-                {order.scheduledTime}
+                {displayOrder.scheduledTime}
               </p>
               <p className="text-[11px] text-[#786C5E]">
-                {order.fulfillmentType === 'pickup' ? 'Counter Pickup' : 'Courier Delivery'}
+                {displayOrder.fulfillmentType === 'pickup' ? 'Counter Pickup' : 'Courier Delivery'}
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-[#E5DACD] space-y-1.5">
               <div className="flex items-center gap-1.5 text-[#8D4B26] font-bold">
                 <MapPin className="w-4 h-4" />
-                <span>{order.fulfillmentType === 'pickup' ? 'Bakery Address' : 'Delivery Address'}</span>
+                <span>{displayOrder.fulfillmentType === 'pickup' ? 'Bakery Address' : 'Delivery Address'}</span>
               </div>
               <p className="font-serif font-bold text-sm text-[#341C02]">
-                {order.fulfillmentType === 'pickup'
+                {displayOrder.fulfillmentType === 'pickup'
                   ? 'Maison Levain, 42 Blvd Saint-Honoré'
-                  : order.deliveryAddress}
+                  : displayOrder.deliveryAddress}
               </p>
               <p className="text-[11px] text-[#786C5E]">
-                Contact: {order.phone}
+                Contact: {displayOrder.phone}
               </p>
             </div>
           </div>
@@ -127,7 +148,7 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
             </h3>
 
             {/* Custom Boxes */}
-            {order.customBoxes.map((box) => (
+            {displayOrder.customBoxes.map((box) => (
               <div key={box.boxId} className="text-xs flex justify-between py-1 border-b border-[#FAF7F2]">
                 <div>
                   <p className="font-semibold text-[#341C02]">{box.name}</p>
@@ -141,7 +162,7 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
             ))}
 
             {/* Standard Items */}
-            {order.items.map((it) => (
+            {displayOrder.items.map((it) => (
               <div key={it.id} className="text-xs flex justify-between py-1 border-b border-[#FAF7F2]">
                 <div>
                   <p className="font-semibold text-[#341C02]">
@@ -164,21 +185,21 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
             <div className="pt-2 space-y-1 text-xs text-[#6B5E4F]">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${order.subtotal.toFixed(2)}</span>
+                <span>${displayOrder.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Taxes</span>
-                <span>${order.tax.toFixed(2)}</span>
+                <span>${displayOrder.tax.toFixed(2)}</span>
               </div>
-              {order.deliveryFee > 0 && (
+              {displayOrder.deliveryFee > 0 && (
                 <div className="flex justify-between">
                   <span>Courier Delivery</span>
-                  <span>${order.deliveryFee.toFixed(2)}</span>
+                  <span>${displayOrder.deliveryFee.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm font-bold text-[#341C02] pt-2 border-t border-[#EFE8DC]">
-                <span className="font-serif">Total Paid ({order.paymentMethod.replace('_', ' ')})</span>
-                <span className="font-serif text-base">${order.total.toFixed(2)}</span>
+                <span className="font-serif">Total Paid ({displayOrder.paymentMethod.replace('_', ' ')})</span>
+                <span className="font-serif text-base">${displayOrder.total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -190,7 +211,7 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
                 Express Counter Pickup Pass
               </p>
               <p className="text-[11px] text-[#786C5E]">
-                Present this digital receipt or mention order #{order.id} at the counter.
+                Present this digital receipt or mention displayOrder #{displayOrder.id} at the counter.
               </p>
             </div>
             <div className="w-16 h-16 bg-white p-2 rounded-xl border border-[#D9CEBF] shadow-xs flex items-center justify-center shrink-0">
@@ -218,7 +239,9 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
           </button>
         </div>
 
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
