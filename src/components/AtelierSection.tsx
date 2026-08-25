@@ -99,7 +99,12 @@ export const AtelierSection: React.FC = () => {
   };
 
   return (
-    <section id="workshops-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#F4EDE2]/70 border-b border-[#E5DACD] relative overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="workshops-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#F4EDE2]/70 border-b border-[#E5DACD] relative overflow-hidden">
       
       {/* Ambient orb */}
       <div className="absolute bottom-10 left-10 w-96 h-96 bg-[#E8C5A0]/20 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -326,6 +331,6 @@ export const AtelierSection: React.FC = () => {
         </div>
       )}
 
-    </section>
+    </motion.section>
   );
 };

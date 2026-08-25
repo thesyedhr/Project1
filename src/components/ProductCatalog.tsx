@@ -86,7 +86,12 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   });
 
   return (
-    <section id="catalog-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="catalog-section" className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
       
       {/* Category Navigation Bar */}
       <motion.div 
@@ -231,6 +236,6 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
         </motion.div>
       )}
 
-    </section>
+    </motion.section>
   );
 };

@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import sys
+
+with open('src/components/CartDrawer.tsx', 'r') as f:
+    content = f.read()
+
+new_cart = """import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, CustomBoxItem } from '../types';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Gift, Tag, Check, Clock, Sparkles } from 'lucide-react';
@@ -23,13 +28,13 @@ const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.2 }
+    transition: { staggerChildren: 0.05, delayChildren: 0.1 }
   }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 25, scale: 0.95, filter: "blur(4px)" },
-  show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { type: "spring", stiffness: 350, damping: 25 } }
+  hidden: { opacity: 0, x: 20, scale: 0.95 },
+  show: { opacity: 1, x: 0, scale: 1, transition: { type: "spring", stiffness: 400, damping: 25 } }
 };
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -88,16 +93,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-md flex justify-end p-4 sm:p-6"
           onClick={onClose}
         >
           <motion.div 
             id="cart-drawer-panel"
-            initial={{ opacity: 0, scale: 0.92, y: 40, filter: "blur(8px)", rotateX: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)", rotateX: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 40, filter: "blur(8px)", rotateX: -8, transition: { ease: "easeInOut", duration: 0.25 } }}
-            transition={{ type: "spring", stiffness: 320, damping: 28, mass: 0.6 }}
-            className="w-full max-w-[460px] max-h-[90vh] flex flex-col bg-[#FAF7F2] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] rounded-3xl overflow-hidden ring-1 ring-inset ring-[#341C02]/20"
+            initial={{ opacity: 0, x: 100, scale: 0.95, rotateY: 10 }}
+            animate={{ opacity: 1, x: 0, scale: 1, rotateY: 0 }}
+            exit={{ opacity: 0, x: 100, scale: 0.95, rotateY: 10, transition: { ease: "easeInOut", duration: 0.3 } }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
+            className="w-full max-w-[420px] h-full bg-[#FAF7F2] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] rounded-3xl overflow-hidden flex flex-col justify-between ring-1 ring-inset ring-[#341C02]/20"
             style={{ perspective: "1000px" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -410,9 +415,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   className="w-full bg-[#E8C5A0] hover:bg-[#D9B48F] text-[#1C140E] py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition-all shadow-[0_4px_20px_rgba(232,197,160,0.3)] flex items-center justify-center gap-3 active:scale-95"
                 >
                   <span>Proceed to Checkout</span>
-                  <motion.div animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}>
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.div>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <p className="text-[11px] text-center text-[#A8794E] flex items-center justify-center gap-1.5 uppercase tracking-wider font-semibold pt-1">
@@ -429,3 +432,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     </AnimatePresence>
   );
 };
+"""
+
+with open('src/components/CartDrawer.tsx', 'w') as f:
+    f.write(new_cart)

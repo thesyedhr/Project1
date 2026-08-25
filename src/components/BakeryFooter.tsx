@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 
 import React, { useState } from 'react';
 import { MapPin, Clock, Phone, Mail, Heart, Wheat, Check, ShieldCheck, Sparkles } from 'lucide-react';
@@ -14,7 +15,12 @@ export const BakeryFooter: React.FC = () => {
   };
 
   return (
-    <footer id="location-section" className="bg-[#241D17] text-[#FAF7F2] pt-16 pb-12 px-4 sm:px-6 lg:px-8 border-t border-[#3A2F26]">
+    <motion.footer
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="location-section" className="bg-[#241D17] text-[#FAF7F2] pt-16 pb-12 px-4 sm:px-6 lg:px-8 border-t border-[#3A2F26]">
       <div className="max-w-7xl mx-auto space-y-12">
         
         {/* Top: Sourdough Care Guide Banner with Glassmorphism */}
@@ -172,6 +178,6 @@ export const BakeryFooter: React.FC = () => {
         </div>
 
       </div>
-    </footer>
+    </motion.footer>
   );
 };

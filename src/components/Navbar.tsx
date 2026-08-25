@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingBag, Search, Sparkles, Clock, MapPin, ReceiptText, ChevronDown, BookOpen } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { CartItem, CustomBoxItem } from '../types';
 import { BakeryLogo } from './BakeryLogo';
 
@@ -41,18 +41,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-50 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2 transition-all">
-      <div className="max-w-7xl mx-auto glass-panel rounded-2xl shadow-sm px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+      <motion.div layout className="w-fit mx-auto bg-white/75 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 border border-[#E6DACB]/80 rounded-2xl shadow-sm px-4 sm:px-6 py-2.5 flex items-center justify-between gap-8" style={{ WebkitBackdropFilter: "blur(12px)", backdropFilter: "blur(12px)" }}>
         
-        {/* Minimal Monogram Emblem Link */}
-        <button 
-          id="nav-brand-logo"
-          onClick={() => onNavigate('hero')}
-          className="flex items-center gap-2.5 group focus:outline-none transition-transform active:scale-95"
-          title="Return to Maison Levain Home"
-        >
-          <BakeryLogo size="sm" />
-
-        </button>
+                {/* Left Side: Logo & Navigation */}
+        <div className="flex items-center gap-6 xl:gap-10">
+          {/* Minimal Monogram Emblem Link */}
+          <button 
+            id="nav-brand-logo"
+            onClick={() => onNavigate('hero')}
+            className="flex items-center gap-2.5 group focus:outline-none transition-transform active:scale-95"
+            title="Return to Maison Levain Home"
+          >
+            <BakeryLogo size="sm" />
+          </button>
 
         {/* Navigation Links */}
         <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-[#5E5244]">
@@ -94,17 +95,36 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="relative z-10">Curate Box</span>
           </button>
 
+          <button
+            onClick={() => onNavigate('location')}
+            className={`relative px-3 py-1.5 rounded-xl transition-colors duration-300 ease-out text-xs font-semibold ${
+              activeSection === 'location'
+                ? 'text-[#341C02]'
+                : 'text-[#5E5244] hover:text-[#341C02] hover:bg-[#F5EFE6]'
+            }`}
+          >
+            {activeSection === 'location' && (
+              <motion.div
+                layoutId="activeNavBubble"
+                className="absolute inset-0 bg-[#EFE8DC]/80 backdrop-blur-md rounded-xl shadow-[0_1px_3px_rgba(52,28,2,0.03)] border border-[#E5DACD]"
+                initial={false}
+                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10">About</span>
+          </button>
+
           {/* More menu dropdown for Schedule, Journal & Reviews */}
           <div className="relative">
             <button
               onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
               className={`relative flex items-center gap-1 px-3 py-1.5 rounded-xl transition-colors duration-300 ease-out text-xs font-semibold ${
-                ['journal', 'reviews', 'location'].includes(activeSection) || isMoreMenuOpen
+                ['journal', 'reviews'].includes(activeSection) || isMoreMenuOpen
                   ? 'text-[#341C02]'
                   : 'text-[#786C5E] hover:text-[#341C02] hover:bg-[#F5EFE6]'
               }`}
             >
-              {(['journal', 'reviews', 'location'].includes(activeSection) || isMoreMenuOpen) && (
+              {(['journal', 'reviews'].includes(activeSection) || isMoreMenuOpen) && (
                 <motion.div
                   layoutId="activeNavBubble"
                   className="absolute inset-0 bg-[#EFE8DC]/80 backdrop-blur-md rounded-xl shadow-[0_1px_3px_rgba(52,28,2,0.03)] border border-[#E5DACD]"
@@ -177,76 +197,112 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </nav>
 
+                </div>
+
         {/* Right side actions: Search, Order Lookup, Cart Button */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center justify-end gap-1.5 sm:gap-2">
           
           {/* Quick Search */}
-          <div className="relative">
-            {isSearchOpen ? (
-              <div className="flex items-center bg-[#FAF7F2] border border-[#D9CEBF] rounded-xl px-2.5 py-1.5 shadow-inner">
-                <Search className="w-4 h-4 text-[#786C5E] mr-1.5 shrink-0" />
-                <input
-                  id="nav-search-input"
-                  type="text"
-                  placeholder="Search sourdough, croissants..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="bg-transparent text-xs sm:text-sm text-[#341C02] focus:outline-none w-32 sm:w-44 placeholder:text-[#9E9080]"
-                  autoFocus
-                />
-                <button
-                  onClick={() => {
-                    setIsSearchOpen(false);
-                    onSearchChange('');
-                  }}
-                  className="text-xs text-[#786C5E] hover:text-[#341C02] px-1"
-                >
-                  ✕
-                </button>
-              </div>
-            ) : (
-              <button
+          <motion.div 
+            layout
+            className={`flex items-center rounded-xl overflow-hidden transition-colors ${
+              isSearchOpen ? 'bg-[#FAF7F2] border border-[#D9CEBF] shadow-inner' : 'hover:bg-[#F2ECE1] border border-transparent'
+            }`}
+            style={{ height: '36px' }}
+          >
+            <div className="flex items-center h-full px-2.5">
+              <button 
                 id="nav-search-toggle"
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2 sm:px-2.5 sm:py-1.5 text-xs font-medium text-[#5E5244] hover:text-[#341C02] hover:bg-[#F2ECE1] rounded-xl transition-colors flex items-center gap-1.5"
-                title="Search Bakery Items"
+                onClick={() => !isSearchOpen && setIsSearchOpen(true)}
+                className={`flex items-center justify-center gap-1.5 focus:outline-none h-full ${isSearchOpen ? 'cursor-default' : 'cursor-pointer'}`}
+                title={isSearchOpen ? "" : "Search Bakery Items"}
+                disabled={isSearchOpen}
               >
-                <Search className="w-4 h-4" />
-                <span className="hidden md:inline">Search</span>
+                <Search className={`w-4 h-4 shrink-0 transition-colors ${isSearchOpen ? 'text-[#786C5E]' : 'text-[#5E5244] hover:text-[#341C02]'}`} />
+                <AnimatePresence initial={false}>
+                  {!isSearchOpen && (
+                    <motion.span
+                      layout
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: "auto", opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="hidden md:inline text-xs font-medium text-[#5E5244] hover:text-[#341C02] whitespace-nowrap overflow-hidden"
+                    >
+                      Search
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </button>
-            )}
-          </div>
+              
+              <AnimatePresence initial={false}>
+                {isSearchOpen && (
+                  <motion.div
+                    layout
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "auto", opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="flex items-center h-full overflow-hidden"
+                  >
+                    <input
+                      id="nav-search-input"
+                      type="text"
+                      placeholder="Search sourdough..."
+                      value={searchQuery}
+                      onChange={(e) => onSearchChange(e.target.value)}
+                      className="bg-transparent text-xs sm:text-sm text-[#341C02] focus:outline-none placeholder:text-[#9E9080] w-[140px] sm:w-[160px] ml-1.5"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => {
+                        setIsSearchOpen(false);
+                        onSearchChange('');
+                      }}
+                      className="text-xs text-[#786C5E] hover:text-[#341C02] px-1 h-full shrink-0"
+                    >
+                      ✕
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
 
           {/* Track Order Button */}
-          <button
+          <motion.button
+            layout
             id="nav-order-lookup-btn"
             onClick={onOpenOrderLookup}
-            className="p-2 sm:px-2.5 sm:py-1.5 text-xs font-medium text-[#5E5244] hover:text-[#341C02] hover:bg-[#F2ECE1] rounded-xl transition-colors flex items-center gap-1.5"
+            className="h-[36px] px-2.5 text-xs font-medium text-[#5E5244] hover:text-[#341C02] hover:bg-[#F2ECE1] rounded-xl transition-colors flex items-center justify-center gap-1.5 overflow-hidden whitespace-nowrap"
             title="Track Your Bakery Order"
           >
-            <ReceiptText className="w-4 h-4 text-[#786C5E]" />
-            <span className="hidden sm:inline">Track</span>
-          </button>
+            <ReceiptText className="w-4 h-4 text-[#786C5E] shrink-0" />
+            <span className="hidden sm:inline-block">Track</span>
+          </motion.button>
 
           {/* Cart Button */}
-          <button
+          <motion.button
+            layout
             id="nav-cart-btn"
             onClick={onOpenCart}
-            className="relative flex items-center gap-2 bg-[#341C02] hover:bg-[#43362A] text-[#FAF7F2] px-3.5 sm:px-4 py-2 rounded-xl transition-all shadow-sm active:scale-95"
+            className="relative h-[36px] px-4 flex items-center justify-center bg-[#341C02] hover:bg-[#43362A] text-[#FAF7F2] rounded-xl transition-colors shadow-sm overflow-hidden whitespace-nowrap"
           >
-            <ShoppingBag className="w-4 h-4" />
-            <span className="text-xs sm:text-sm font-semibold">
-              Cart {totalCartCount > 0 && `(${totalCartCount})`}
-            </span>
-            {totalCartPrice > 0 && (
-              <span className="hidden sm:inline-block text-xs font-medium text-[#D8C7B5] border-l border-white/20 pl-2">
-                ${totalCartPrice.toFixed(2)}
+            <ShoppingBag className="w-4 h-4 shrink-0" />
+            <div className="flex items-center gap-2 overflow-hidden ml-2">
+              <span className="text-xs sm:text-sm font-semibold">
+                Cart {totalCartCount > 0 && `(${totalCartCount})`}
               </span>
-            )}
-          </button>
+              {totalCartPrice > 0 && (
+                <span className="hidden sm:inline-block text-xs font-medium text-[#D8C7B5] border-l border-white/20 pl-2">
+                  ${totalCartPrice.toFixed(2)}
+                </span>
+              )}
+            </div>
+          </motion.button>
         </div>
 
-      </div>
+      </motion.div>
     </header>
   );
 };

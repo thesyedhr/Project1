@@ -137,7 +137,12 @@ export const PairingGuideSection: React.FC<PairingGuideSectionProps> = ({
   };
 
   return (
-    <section id="pairings-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#F4EDE2]/50 border-b border-[#E5DACD] relative overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="pairings-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#F4EDE2]/50 border-b border-[#E5DACD] relative overflow-hidden">
       
       {/* Ambient glow */}
       <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#E8C5A0]/20 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -186,7 +191,7 @@ export const PairingGuideSection: React.FC<PairingGuideSectionProps> = ({
                   onClick={() => setSelectedProfile(profile)}
                   className={`w-full p-3.5 rounded-2xl text-left transition-all border flex items-center gap-3.5 ${
                     isSelected
-                      ? 'bg-white border-[#341C02] shadow-md ring-1 ring-[#341C02]/20'
+                      ? 'bg-white border-[#A8794E] shadow-md ring-1 ring-[#A8794E]/30'
                       : 'glass-card border-[#E5DACD] hover:bg-white/70'
                   }`}
                 >
@@ -335,6 +340,6 @@ export const PairingGuideSection: React.FC<PairingGuideSectionProps> = ({
         </div>
 
       </div>
-    </section>
+    </motion.section>
   );
 };

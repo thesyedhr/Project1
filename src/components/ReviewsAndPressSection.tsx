@@ -39,7 +39,7 @@ const CUSTOMER_REVIEWS: Review[] = [
   {
     id: 'rev-1',
     author: 'Élodie Fontaine',
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/1280px-Pierre-Person.jpg',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150',
     role: 'Saint-Honoré Resident',
     rating: 5,
     date: 'Yesterday',
@@ -50,7 +50,7 @@ const CUSTOMER_REVIEWS: Review[] = [
   {
     id: 'rev-2',
     author: 'Marc Vandeberg',
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/1280px-Pierre-Person.jpg',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
     role: 'Verified Food Critic',
     rating: 5,
     date: '3 days ago',
@@ -61,7 +61,7 @@ const CUSTOMER_REVIEWS: Review[] = [
   {
     id: 'rev-3',
     author: 'Sophie Chen',
-    avatar: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Pierre-Person.jpg/1280px-Pierre-Person.jpg',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150',
     role: 'Home Sourdough Baker',
     rating: 5,
     date: '1 week ago',
@@ -75,7 +75,12 @@ export const ReviewsAndPressSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'press' | 'reviews'>('press');
 
   return (
-    <section id="reviews-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF7F2] border-b border-[#E5DACD] relative overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="reviews-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF7F2] border-b border-[#E5DACD] relative overflow-hidden">
       
       <div className="max-w-7xl mx-auto space-y-12">
         
@@ -223,6 +228,6 @@ export const ReviewsAndPressSection: React.FC = () => {
         </AnimatePresence>
 
       </div>
-    </section>
+    </motion.section>
   );
 };

@@ -35,7 +35,12 @@ export const ArtisanalCraftSection: React.FC = () => {
   const analysis = getHydrationAnalysis(hydrationLevel);
 
   return (
-    <section id="craft-section" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#F4EDE2]/70 border-y border-[#E5DACD] relative overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="craft-section" className="py-16 px-4 sm:px-6 lg:px-8 bg-[#F4EDE2]/70 border-y border-[#E5DACD] relative overflow-hidden">
       
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-10 w-96 h-96 bg-[#E8C5A0]/20 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -191,6 +196,6 @@ export const ArtisanalCraftSection: React.FC = () => {
         </motion.div>
 
       </div>
-    </section>
+    </motion.section>
   );
 };

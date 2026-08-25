@@ -88,7 +88,12 @@ export const TerroirGrainSection: React.FC<TerroirGrainSectionProps> = ({
   const selectedGrain = GRAINS.find(g => g.id === selectedGrainId) || GRAINS[0];
 
   return (
-    <section id="grains-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF7F2] border-b border-[#E5DACD] relative overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      id="grains-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-[#FAF7F2] border-b border-[#E5DACD] relative overflow-hidden">
       
       {/* Background ambient lighting */}
       <div className="absolute top-1/3 right-5 w-80 h-80 bg-[#C89666]/10 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -134,7 +139,7 @@ export const TerroirGrainSection: React.FC<TerroirGrainSectionProps> = ({
                   onClick={() => setSelectedGrainId(grain.id)}
                   className={`w-full p-4 rounded-2xl text-left transition-all duration-300 border flex items-center justify-between ${
                     isSelected
-                      ? 'bg-white border-[#341C02] shadow-md -translate-x-1 sm:-translate-x-2'
+                      ? 'bg-white border-[#A8794E] shadow-md ring-1 ring-[#A8794E]/30 -translate-x-1 sm:-translate-x-2'
                       : 'glass-card border-[#E5DACD] hover:bg-white/70 hover:border-[#D0C0AC]'
                   }`}
                 >
@@ -261,6 +266,6 @@ export const TerroirGrainSection: React.FC<TerroirGrainSectionProps> = ({
         </div>
 
       </div>
-    </section>
+    </motion.section>
   );
 };

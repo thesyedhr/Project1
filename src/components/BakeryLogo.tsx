@@ -1,63 +1,76 @@
 import React from 'react';
-import defaultLogo from '../assets/logo.png';
 
 interface BakeryLogoProps {
-  variant?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'hero';
   className?: string;
-  theme?: string;
-  customLogoUrl?: string;
-  logoOffsetX?: number;
-  logoOffsetY?: number;
-  logoZoom?: number;
 }
 
 export const BakeryLogo: React.FC<BakeryLogoProps> = ({
   size = 'md',
   className = '',
-  customLogoUrl = defaultLogo,
-  logoZoom = 1.70,
-  logoOffsetX = 0,
-  logoOffsetY = 4,
 }) => {
   const sizeMap = {
-    xs: 'w-7 h-7',
-    sm: 'w-10 h-10',
-    md: 'w-14 h-14',
+    xs: 'w-8 h-8',
+    sm: 'w-12 h-12',
+    md: 'w-16 h-16',
     lg: 'w-24 h-24',
     xl: 'w-36 h-36',
     hero: 'w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56',
   };
 
-  const pxMap = {
-    xs: 28,
-    sm: 40,
-    md: 56,
-    lg: 96,
-    xl: 144,
-    hero: 224,
-  };
-
   const dimensionClass = sizeMap[size] || sizeMap.md;
-  
-  // Calculate proportional offset. The aligner was used on the hero size (224px reference).
-  // A 4px offset on a 224px circle needs to be proportionally smaller on a 40px circle.
-  const scaleFactor = (pxMap[size] || 56) / 224;
+  const bronzeColor = "#A87B4C";
 
   return (
-    <div className={`rounded-full overflow-hidden shrink-0 bg-transparent ${dimensionClass} ${className} relative isolate`}>
-      <img 
-        referrerPolicy="no-referrer"
-        src={customLogoUrl} 
-        alt="Logo"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          transform: `scale(${logoZoom}) translate(${logoOffsetX * scaleFactor}px, ${logoOffsetY * scaleFactor}px) translateZ(0)`,
-          transformOrigin: 'center',
-          WebkitBackfaceVisibility: 'hidden',
-          backfaceVisibility: 'hidden'
-        }}
-      />
+    <div className={`rounded-full flex items-center justify-center shrink-0 bg-[#F8F1E5] ${dimensionClass} ${className} relative isolate overflow-hidden`}>
+      <svg 
+        viewBox="0 0 120 120" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full h-full relative z-10"
+      >
+        <defs>
+          <style>
+            {`
+              @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+              .monogram-ml {
+                font-family: 'Playfair Display', serif;
+                font-size: 45px;
+                font-weight: 500;
+                letter-spacing: -0.05em;
+              }
+            `}
+          </style>
+        </defs>
+
+        {/* Outer Solid Ring */}
+        <circle cx="60" cy="60" r="54" stroke={bronzeColor} strokeWidth="0.8" />
+        
+        {/* Dashed Ring */}
+        <circle cx="60" cy="60" r="48" stroke={bronzeColor} strokeWidth="0.6" strokeDasharray="1.5 3.5" />
+        
+        {/* Diamonds at compass points */}
+        <path d="M60 10 L61.5 12 L60 14 L58.5 12 Z" fill={bronzeColor} />
+        <path d="M60 106 L61.5 108 L60 110 L58.5 108 Z" fill={bronzeColor} />
+        <path d="M10 60 L12 58.5 L14 60 L12 61.5 Z" fill={bronzeColor} />
+        <path d="M106 60 L108 58.5 L110 60 L108 61.5 Z" fill={bronzeColor} />
+
+        {/* Inner Double Rings */}
+        <circle cx="60" cy="60" r="39" stroke={bronzeColor} strokeWidth="1" />
+        <circle cx="60" cy="60" r="37.2" stroke={bronzeColor} strokeWidth="0.3" />
+        
+        {/* Clean ML Monogram - Optically centered to user specifications */}
+        <text 
+          x="49.0%" 
+          y="47.0%" 
+          dominantBaseline="central" 
+          textAnchor="middle" 
+          className="monogram-ml" 
+          fill={bronzeColor}
+        >
+          ML
+        </text>
+      </svg>
     </div>
   );
 };

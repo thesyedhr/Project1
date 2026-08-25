@@ -20,7 +20,7 @@ export const BakeScheduleModal: React.FC<BakeScheduleModalProps> = ({
       
       <div 
         id="bake-schedule-modal"
-        className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#E5DACD] overflow-hidden"
+        className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#341C02] overflow-hidden"
       >
         {/* Header */}
         <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] relative overflow-hidden">
