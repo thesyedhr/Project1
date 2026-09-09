@@ -45,11 +45,11 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
-            className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#E5DACD] overflow-hidden my-auto"
+            className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
         {/* Header Ribbon */}
-        <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] text-center relative">
+        <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] text-center relative rounded-t-3xl">
           <button
             id="close-confirmation-modal"
             onClick={onClose}

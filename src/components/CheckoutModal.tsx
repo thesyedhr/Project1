@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CartItem, CustomBoxItem, OrderDetails } from '../types';
-import { X, Clock, MapPin, CreditCard, CheckCircle2, ShieldCheck, ArrowRight, User, Phone, Mail, ShoppingBag } from 'lucide-react';
+import { CartItem, CustomBoxItem, OrderDetails, UserProfile } from '../types';
+import { X, Clock, MapPin, CreditCard, CheckCircle2, ShieldCheck, ArrowRight, User, Phone, Mail, ShoppingBag, Crown, Lock, LogIn } from 'lucide-react';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -10,6 +10,8 @@ interface CheckoutModalProps {
   customBoxes: CustomBoxItem[];
   fulfillmentType: 'pickup' | 'delivery';
   discountAmount: number;
+  currentUser?: UserProfile | null;
+  onOpenAuth?: () => void;
   onCompleteOrder: (order: OrderDetails) => void;
 }
 
@@ -20,18 +22,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   customBoxes,
   fulfillmentType,
   discountAmount,
+  currentUser,
+  onOpenAuth,
   onCompleteOrder,
 }) => {
 
   // Form State
-  const [customerName, setCustomerName] = useState('Elena Rostova');
-  const [email, setEmail] = useState('elena.rostova@example.com');
-  const [phone, setPhone] = useState('+1 (555) 382-9104');
+  const [customerName, setCustomerName] = useState(currentUser?.name || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
+  const [phone, setPhone] = useState(currentUser?.phone || '+1 (555) 382-9104');
   const [scheduledTime, setScheduledTime] = useState('Today • 11:30 AM (Oven Batch #03)');
-  const [deliveryAddress, setDeliveryAddress] = useState('742 Evergreen Terrace, Historic District');
+  const [deliveryAddress, setDeliveryAddress] = useState(currentUser?.deliveryAddress || '742 Evergreen Terrace, Historic District');
   const [orderNotes, setOrderNotes] = useState('Please pack sourdough in paper bread bags if possible.');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_pay' | 'pickup_counter'>('card');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  React.useEffect(() => {
+    if (currentUser) {
+      setCustomerName(currentUser.name);
+      setEmail(currentUser.email);
+      if (currentUser.phone) setPhone(currentUser.phone);
+      if (currentUser.deliveryAddress) setDeliveryAddress(currentUser.deliveryAddress);
+    }
+  }, [currentUser]);
 
   const itemsSubtotal = cartItems.reduce(
     (acc, item) => acc + item.unitPrice * item.quantity,
@@ -55,6 +68,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentUser) {
+      if (onOpenAuth) onOpenAuth();
+      return;
+    }
     if (!customerName || !email || !phone) return;
 
     setIsProcessing(true);
@@ -64,8 +81,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       items: [...cartItems],
       customBoxes: [...customBoxes],
-      customerName,
-      email,
+      customerName: currentUser?.name || customerName,
+      email: currentUser?.email || email,
       phone,
       fulfillmentType,
       scheduledTime,
@@ -102,11 +119,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
-            className="relative w-full max-w-3xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#E5DACD] overflow-hidden my-auto"
+            className="relative w-full max-w-3xl bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
         {/* Header */}
-        <div className="p-6 sm:p-7 bg-[#341C02] text-[#FAF7F2] relative flex items-center justify-between">
+        <div className="p-6 sm:p-7 bg-[#341C02] text-[#FAF7F2] relative flex items-center justify-between rounded-t-3xl">
           <div>
             <div className="flex items-center gap-2 text-xs uppercase font-bold tracking-widest text-[#E8C5A0] mb-1">
               <ShieldCheck className="w-4 h-4 text-[#E27D60]" />
@@ -126,50 +143,91 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmitOrder} className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
-          
-          {/* Section 1: Customer Contact */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#5E5244] flex items-center gap-1.5">
-              <User className="w-4 h-4 text-[#8D4B26]" />
-              <span>1. Guest Contact Details</span>
-            </h3>
+            {/* Authentication Gate: Require user to sign in or register before checkout */}
+            {!currentUser ? (
+              <div className="p-8 sm:p-12 text-center space-y-6">
+                <div className="w-16 h-16 rounded-3xl bg-[#EFE8DC] border border-[#E2D6C7] flex items-center justify-center mx-auto text-[#8D4B26] shadow-sm">
+                  <Lock className="w-8 h-8" />
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs text-[#6B5E4F] block mb-1">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#D9CEBF] bg-white text-[#341C02] focus:outline-none focus:ring-1 focus:ring-[#341C02]"
-                />
-              </div>
+                <div className="space-y-2 max-w-md mx-auto">
+                  <h3 className="font-serif font-bold text-2xl text-[#341C02]">
+                    Patron Sign In Required
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#786C5E] leading-relaxed">
+                    Please sign in or create a patron account before placing your order. This ensures your oven batch reservation is confirmed and kept private to your account.
+                  </p>
+                </div>
 
-              <div>
-                <label className="text-xs text-[#6B5E4F] block mb-1">Email Address</label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#D9CEBF] bg-white text-[#341C02] focus:outline-none focus:ring-1 focus:ring-[#341C02]"
-                />
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-sm mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onOpenAuth) {
+                        onClose();
+                        onOpenAuth();
+                      }
+                    }}
+                    className="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-[#341C02] hover:bg-[#4A3C2F] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 active:scale-95"
+                  >
+                    <LogIn className="w-4 h-4 text-[#E8C5A0]" />
+                    <span>Sign In</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onOpenAuth) {
+                        onClose();
+                        onOpenAuth();
+                      }
+                    }}
+                    className="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-white border border-[#D9CEBF] hover:bg-[#F5EFE6] text-[#341C02] font-bold text-xs uppercase tracking-wider transition-all"
+                  >
+                    Create Account
+                  </button>
+                </div>
               </div>
+            ) : (
+              <form onSubmit={handleSubmitOrder} className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
+                
+                {/* Patron Identification Badge */}
+                <div className="p-4 rounded-2xl bg-white border border-[#E5DACD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#341C02] text-[#E8C5A0] flex items-center justify-center font-bold text-sm">
+                      {currentUser.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-serif font-bold text-sm text-[#341C02]">{currentUser.name}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#EFE8DC] text-[#8D4B26] font-bold">
+                          {currentUser.tier}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#786C5E]">{currentUser.email}</p>
+                    </div>
+                  </div>
 
-              <div>
-                <label className="text-xs text-[#6B5E4F] block mb-1">Phone Number</label>
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#D9CEBF] bg-white text-[#341C02] focus:outline-none focus:ring-1 focus:ring-[#341C02]"
-                />
-              </div>
-            </div>
-          </div>
+                  <div className="text-left sm:text-right">
+                    <span className="text-[10px] uppercase font-bold text-[#A8794E] tracking-wider block">Club Loyalty</span>
+                    <span className="text-xs font-bold text-[#341C02]">+{Math.max(10, Math.round(total * 10))} points on checkout</span>
+                  </div>
+                </div>
+
+                {/* Section 1: Contact Phone */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#5E5244] flex items-center gap-1.5">
+                    <Phone className="w-4 h-4 text-[#8D4B26]" />
+                    <span>1. Contact Phone Number</span>
+                  </h3>
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Enter phone number for SMS oven-ready alerts"
+                    className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#D9CEBF] bg-white text-[#341C02] focus:outline-none focus:border-[#8D4B26] shadow-sm"
+                  />
+                </div>
 
           {/* Section 2: Fulfillment & Time */}
           <div className="space-y-3 pt-2 border-t border-[#EAE0D3]">
@@ -315,6 +373,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
 
         </form>
+            )}
           </motion.div>
         </motion.div>
       )}

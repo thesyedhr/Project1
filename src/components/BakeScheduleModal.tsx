@@ -32,11 +32,11 @@ export const BakeScheduleModal: React.FC<BakeScheduleModalProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.8 }}
-            className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl border border-[#341C02] overflow-hidden my-auto"
+            className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden my-auto"
             onClick={(e) => e.stopPropagation()}
           >
         {/* Header */}
-        <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] relative overflow-hidden">
+        <div className="p-6 sm:p-8 bg-[#341C02] text-[#FAF7F2] relative overflow-hidden rounded-t-3xl">
           {/* Background image in header */}
           <div className="absolute inset-0 opacity-20 pointer-events-none">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/USS_John_C._Stennis_baker.jpg/1280px-USS_John_C._Stennis_baker.jpg" alt="Oven" className="w-full h-full object-cover" />

@@ -84,3 +84,17 @@ export interface OrderDetails {
   paymentMethod: 'card' | 'apple_pay' | 'pickup_counter';
   status: 'confirmed' | 'fermenting' | 'in_hearth' | 'cooling' | 'ready' | 'completed';
 }
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  tier: 'Club Member' | 'Heritage Patron' | 'Grand Cru Patron';
+  loyaltyPoints: number;
+  phone?: string;
+  preferredFulfillment?: 'pickup' | 'delivery';
+  deliveryAddress?: string;
+  favoriteCraft?: string;
+  joinedDate: string;
+}

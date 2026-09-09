@@ -83,12 +83,12 @@ export const Hero: React.FC<HeroProps> = ({ onOrderNow }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
           >
-            <h1 className="text-[70px] font-serif font-bold text-[#341c02] leading-tight tracking-tight -mt-[6px]">
+            <h1 className="text-[70px] font-serif font-bold text-[#341c02] leading-[60px] tracking-tight -mt-[6px]">
               Maison Levain
             </h1>
             
             {/* Subheader lines */}
-            <div className="flex items-center justify-center w-full max-w-xl mx-auto gap-4 -mt-[6px] mb-[25px]">
+            <div className="flex items-center justify-center w-full max-w-xl mx-auto gap-4 mt-[11px] mb-[25px]">
               <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#D0C5B8]"></div>
               <span className="text-[9px] text-center uppercase tracking-[0.25em] font-semibold text-[#8C7A68]">
                 Paris &bull; Fournil Artisanal &bull; Depuis 1912

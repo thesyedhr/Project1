@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BakeryItem, CartItem, CustomBoxItem, OrderDetails, Category, SlicingOption } from './types';
+import { BakeryItem, CartItem, CustomBoxItem, OrderDetails, Category, SlicingOption, UserProfile } from './types';
 import { BAKERY_PRODUCTS } from './data/products';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -17,6 +17,10 @@ import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
 import { OrderLookupModal } from './components/OrderLookupModal';
+import { AuthModal } from './components/AuthModal';
+import { AccountModal } from './components/AccountModal';
+import { ClubMaisonSection } from './components/ClubMaisonSection';
+import { ClubMaisonModal } from './components/ClubMaisonModal';
 import { BakeryFooter } from './components/BakeryFooter';
 import { ShoppingBag, Sparkles, Clock, Check } from 'lucide-react';
 
@@ -27,6 +31,18 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeSection, setActiveSection] = useState<string>('catalog');
 
+  // Patron & Auth State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('maison_levain_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
+  const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
+
   // Modals & Drawers State
   const [selectedDetailItem, setSelectedDetailItem] = useState<BakeryItem | null>(null);
   const [isBoxBuilderOpen, setIsBoxBuilderOpen] = useState<boolean>(false);
@@ -34,6 +50,7 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [isOrderLookupOpen, setIsOrderLookupOpen] = useState<boolean>(false);
+  const [isClubModalOpen, setIsClubModalOpen] = useState<boolean>(false);
   const [confirmedOrder, setConfirmedOrder] = useState<OrderDetails | null>(null);
 
   // Cart & Fulfillment State
@@ -82,6 +99,39 @@ export default function App() {
     localStorage.setItem('maison_levain_orders', JSON.stringify(orders));
   }, [orders]);
 
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('maison_levain_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('maison_levain_user');
+    }
+  }, [currentUser]);
+
+  // Check if any floating modal or drawer is active
+  const isAnyModalOpen = Boolean(
+    selectedDetailItem ||
+    isBoxBuilderOpen ||
+    isScheduleOpen ||
+    isCartOpen ||
+    isCheckoutOpen ||
+    isOrderLookupOpen ||
+    isAuthOpen ||
+    isAccountOpen ||
+    isClubModalOpen ||
+    confirmedOrder
+  );
+
+  // Implement scroll lock on background for all floating sections
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isAnyModalOpen]);
+
   // ScrollSpy effect to highlight navbar sections on scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -106,6 +156,7 @@ export default function App() {
       'pairings',
       'craft',
       'workshops',
+      'club',
       'journal',
       'reviews',
       'location',
@@ -239,6 +290,52 @@ export default function App() {
     setIsCheckoutOpen(false);
     setIsCartOpen(false);
     setConfirmedOrder(newOrder);
+
+    // Award loyalty points to logged-in patron
+    if (currentUser) {
+      const earnedPoints = Math.max(10, Math.round(newOrder.total * 10));
+      const newTotalPoints = currentUser.loyaltyPoints + earnedPoints;
+      const upgradedTier =
+        newTotalPoints >= 500
+          ? 'Grand Cru Patron'
+          : newTotalPoints >= 200
+          ? 'Heritage Patron'
+          : currentUser.tier;
+
+      const updatedUser: UserProfile = {
+        ...currentUser,
+        loyaltyPoints: newTotalPoints,
+        tier: upgradedTier,
+      };
+      setCurrentUser(updatedUser);
+      setToastMessage(`Order placed! +${earnedPoints} Club Points earned.`);
+      setTimeout(() => setToastMessage(null), 4500);
+    }
+  };
+
+  const handleLoginSuccess = (user: UserProfile) => {
+    setCurrentUser(user);
+    setToastMessage(`Bienvenue, ${user.name}! Signed into Club Maison Levain.`);
+    setTimeout(() => setToastMessage(null), 4000);
+    // If user has pending cart items, smoothly proceed to checkout
+    if (cartItems.length > 0 || customBoxes.length > 0) {
+      setTimeout(() => {
+        setIsCheckoutOpen(true);
+      }, 300);
+    }
+  };
+
+  const handleSignOut = () => {
+    const prevName = currentUser?.name;
+    setCurrentUser(null);
+    setToastMessage(`Au revoir${prevName ? `, ${prevName}` : ''}. You have signed out.`);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleUpdateUser = (updated: UserProfile) => {
+    setCurrentUser(updated);
+    setToastMessage('Patron profile updated successfully.');
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -255,6 +352,8 @@ export default function App() {
       document.getElementById('journal-section')?.scrollIntoView({ behavior: 'smooth' });
     } else if (sectionId === 'workshops') {
       document.getElementById('workshops-section')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (sectionId === 'club') {
+      document.getElementById('club-section')?.scrollIntoView({ behavior: 'smooth' });
     } else if (sectionId === 'reviews') {
       document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' });
     } else if (sectionId === 'location') {
@@ -311,6 +410,10 @@ export default function App() {
         onNavigate={scrollToSection}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAccount={() => setIsAccountOpen(true)}
+        onOpenClubModal={() => setIsClubModalOpen(true)}
       />
 
       {/* Hero Section */}
@@ -358,7 +461,15 @@ export default function App() {
         {/* 6. Paris Atelier & VIP Masterclasses */}
         <AtelierSection />
 
-        {/* 7. Michelin & Patron Critical Acclaim */}
+        {/* 7. Club Maison Levain Loyalty & Guild Tiers */}
+        <ClubMaisonSection
+          currentUser={currentUser}
+          onOpenClubModal={() => setIsClubModalOpen(true)}
+          onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenAccount={() => setIsAccountOpen(true)}
+        />
+
+        {/* 8. Michelin & Patron Critical Acclaim */}
         <ReviewsAndPressSection />
 
       </main>
@@ -404,7 +515,12 @@ export default function App() {
         onRemoveBox={handleRemoveBox}
         onProceedToCheckout={() => {
           setIsCartOpen(false);
-          setIsCheckoutOpen(true);
+          if (!currentUser) {
+            setIsAuthOpen(true);
+            setToastMessage("Please sign in or create a patron account to proceed to checkout.");
+          } else {
+            setIsCheckoutOpen(true);
+          }
         }}
         fulfillmentType={fulfillmentType}
         onFulfillmentTypeChange={setFulfillmentType}
@@ -421,6 +537,8 @@ export default function App() {
         customBoxes={customBoxes}
         fulfillmentType={fulfillmentType}
         discountAmount={discountAmount}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
         onCompleteOrder={handleOrderCompleted}
       />
 
@@ -437,6 +555,37 @@ export default function App() {
         onClose={() => setIsOrderLookupOpen(false)}
         orders={orders}
         onSelectOrder={(ord) => setConfirmedOrder(ord)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+      />
+
+      {/* 8. Patron Auth & Sign In Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* 9. Patron VIP Account & Loyalty Modal */}
+      <AccountModal
+        isOpen={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        user={currentUser}
+        onSignOut={handleSignOut}
+        onUpdateUser={handleUpdateUser}
+        onOpenOrderLookup={() => setIsOrderLookupOpen(true)}
+        onOpenSchedule={() => setIsScheduleOpen(true)}
+        onOpenBoxBuilder={() => setIsBoxBuilderOpen(true)}
+        onOpenClubModal={() => setIsClubModalOpen(true)}
+      />
+
+      {/* 10. Club Maison Levain Tier & Loyalty Program Modal */}
+      <ClubMaisonModal
+        isOpen={isClubModalOpen}
+        onClose={() => setIsClubModalOpen(false)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAccount={() => setIsAccountOpen(true)}
       />
 
     </div>
